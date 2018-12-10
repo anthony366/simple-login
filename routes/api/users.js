@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const keys = require("../../config/keys");
+const passport = require("passport");
 const User = require("../../models/User");
 
 //register user
@@ -55,7 +56,7 @@ router.post("/login", (req, res) => {
           keys.secretKey,
           { expiresIn: "24h" },
           (err, token) => {
-            res.json({ success: true, token: "Bearer" + token });
+            res.json({ success: true, token: "Bearer " + token });
           }
         );
       } else {
@@ -64,5 +65,16 @@ router.post("/login", (req, res) => {
     });
   });
 });
+
+router.get(
+  "/current",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    res.json({
+      firstname: req.user.firstname,
+      lastname: req.user.lastname
+    });
+  }
+);
 
 module.exports = router;
